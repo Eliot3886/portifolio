@@ -9,6 +9,14 @@ scrollLinks.forEach(link => {
   });
 });
 
+// Scroll Progress Bar
+window.addEventListener('scroll', () => {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById("progressBar").style.width = scrolled + "%";
+});
+
 const fadeInElements = document.querySelectorAll('.fade-in');
 const observer = new IntersectionObserver((entries, observer) => {
   entries.forEach(entry => {
@@ -32,11 +40,63 @@ navLinks.forEach(link => {
   });
 });
 
-// Dark mode toggle
-const toggleButton = document.getElementById('darkModeToggle');
-toggleButton.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-});
+// Typing Effect
+const typingText = document.getElementById('typing-text');
+const words = ["Computer Science Student", "Android Developer", "Full Stack Engineer", "Problem Solver"];
+let wordIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+
+function type() {
+    const currentWord = words[wordIndex];
+    if (isDeleting) {
+        typingText.textContent = currentWord.substring(0, charIndex - 1);
+        charIndex--;
+    } else {
+        typingText.textContent = currentWord.substring(0, charIndex + 1);
+        charIndex++;
+    }
+
+    if (!isDeleting && charIndex === currentWord.length) {
+        isDeleting = true;
+        setTimeout(type, 2000);
+    } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        wordIndex = (wordIndex + 1) % words.length;
+        setTimeout(type, 500);
+    } else {
+        setTimeout(type, isDeleting ? 50 : 100);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', type);
+
+// Counter Animation
+const stats = document.querySelectorAll('.stat-number');
+const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const target = +entry.target.getAttribute('data-target');
+            let count = 0;
+            const updateCount = () => {
+                const speed = 2000 / target;
+                if (count < target) {
+                    count++;
+                    entry.target.innerText = count + (target === 3 || target === 15 ? "+" : "");
+                    setTimeout(updateCount, speed);
+                } else {
+                    entry.target.innerText = target + (target === 3 || target === 15 ? "+" : "");
+                }
+            };
+            updateCount();
+            statsObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 1 });
+
+stats.forEach(stat => statsObserver.observe(stat));
+
+
 
 // Contact Form AJAX Submission
 const contactForm = document.querySelector('form[action^="https://formspree.io"]');
